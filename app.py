@@ -595,6 +595,7 @@ def owner_signup():
 
 model = None
 
+
 def get_model():
     global model
 
@@ -603,16 +604,16 @@ def get_model():
 
         model_path = os.path.join(BASE_DIR, "yolov8n.pt")
 
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(
-                f"YOLO model file not found: {model_path}"
-            )
-
-        model = YOLO(model_path)
+        if os.path.exists(model_path):
+            model = YOLO(model_path)
+        else:
+            print("Model not found locally. Downloading YOLOv8n...")
+            model = YOLO("yolov8n.pt")
 
         print("YOLOv8n loaded successfully!")
 
     return model
+
 
 
 
