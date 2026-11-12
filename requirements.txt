@@ -1,5 +1,8 @@
+
 Flask
 Werkzeug
 ultralytics
-opencv-python
+opencv-python-headless
 numpy
+cryptography
+gunicorn
