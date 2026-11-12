@@ -1,0 +1,108 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | CrowdSense{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="welcome-banner">
+    <p>SMART CROWD INTELLIGENCE</p>
+    <h1>Welcome to CrowdSense</h1>
+    <p>Monitor and analyse crowd activity using computer vision.</p>
+</section>
+
+<h2 class="section-title">System Overview</h2>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <p>Total Detections</p>
+        <h2 id="total-people">--</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Average People</p>
+        <h2 id="average-people">--</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Highest Crowd Count</p>
+        <h2 id="highest-people">--</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>High-Density Alerts</p>
+        <h2 id="high-alerts">--</h2>
+    </div>
+
+</div>
+
+<div class="monitor-grid">
+
+    <div class="monitor-card">
+        <h3>Live Camera</h3>
+
+        <video id="camera-preview"
+               autoplay
+               playsinline
+               muted
+               style="display:none; width:100%; border-radius:10px;">
+        </video>
+
+        <div id="camera-placeholder">
+            <p>Camera preview will appear here.</p>
+        </div>
+
+        <button id="camera-button" class="primary-button">
+            Enable Camera
+        </button>
+
+        <p id="camera-message">Camera inactive.</p>
+        <p id="camera-status">Inactive</p>
+    </div>
+
+    <div class="monitor-card">
+        <h3>Upload Crowd Image</h3>
+
+        <input type="file"
+               id="image-input"
+               accept=".jpg,.jpeg,.png,.webp">
+
+        <img id="image-preview"
+             alt="Image preview"
+             style="display:none; width:100%; margin-top:15px;">
+
+        <button id="upload-button" class="primary-button">
+            Upload Image
+        </button>
+
+        <p id="image-message">No image selected.</p>
+    </div>
+
+</div>
+
+<div class="monitor-grid">
+
+    <div class="monitor-card">
+        <h3>Crowd Density Distribution</h3>
+        <p>Low: <strong id="low-density">0</strong></p>
+        <p>Medium: <strong id="medium-density">0</strong></p>
+        <p>High: <strong id="high-density">0</strong></p>
+        <p id="dashboard-density-status">Loading statistics...</p>
+    </div>
+
+    <div class="monitor-card">
+        <h3>Recent Detection Activity</h3>
+        <div id="recent-activity">
+            <p>Loading recent detections...</p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

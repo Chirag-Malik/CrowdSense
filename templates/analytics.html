@@ -1,0 +1,72 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="analytics-page">
+
+    <div class="page-heading">
+        <h1>Analytics Dashboard</h1>
+        <p>Monitor crowd detection statistics and activity.</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="analytics-cards">
+
+        <div class="analytics-card">
+            <h3>Total Detections</h3>
+            <p id="total-detections">--</p>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Average People</h3>
+            <p id="average-people">--</p>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Highest Crowd</h3>
+            <p id="highest-people">--</p>
+        </div>
+
+    </div>
+
+    <!-- Density Distribution -->
+    <div class="analytics-section">
+        <h2>Crowd Density Distribution</h2>
+
+        <div id="density-distribution">
+            Loading density data...
+        </div>
+    </div>
+
+    <!-- Detection History -->
+    <div class="analytics-section">
+        <h2>Recent Detection History</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>People</th>
+                        <th>Density</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody id="detection-history">
+                    <tr>
+                        <td colspan="4">Loading records...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+{% endblock %}

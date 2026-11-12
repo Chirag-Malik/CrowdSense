@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrowdSense Mobile Camera</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #101318;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        h1 { color: #38bdf8; }
+
+        video {
+            width: 100%;
+            background: black;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        button, select {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #38bdf8;
+            color: #07111b;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+        }
+
+        #status {
+            margin-top: 18px;
+            color: #facc15;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>CrowdSense Mobile Camera</h1>
+    <p>Use your iPhone as a remote crowd-monitoring camera.</p>
+
+    <select id="location">
+        <option value="">Loading locations...</option>
+    </select>
+
+    <video id="camera" autoplay playsinline muted></video>
+
+    <button id="start">Start Mobile Camera</button>
+    <button id="stop" disabled>Stop Camera</button>
+
+    <p id="status">Camera is offline.</p>
+
+</div>
+
+<script>
+const video = document.getElementById("camera");
+const locationSelect = document.getElementById("location");
+const startButton = document.getElementById("start");
+const stopButton = document.getElementById("stop");
+const statusText = document.getElementById("status");
+
+let cameraStream = null;
+let monitoring = false;
+let sending = false;
+let cameraId = null;
+let cameraToken = null;
+
+async function loadLocations() {
+    try {
+        const response = await fetch("/api/owner-locations");
+        const data = await response.json();
+
+        locationSelect.innerHTML =
+            '<option value="">Select location</option>';
+
+        (data.locations || []).forEach(location => {
+            const option = document.createElement("option");
+            option.value = location.id;
+            option.textContent = location.location_name;
+            locationSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        statusText.textContent = "Could not load locations.";
+    }
+}
+
+async function sendFrame() {
+    if (!monitoring || sending) return;
+
+    sending = true;
+
+    try {
+        const canvas = document.createElement("canvas");
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        canvas.getContext("2d").drawImage(
+            video, 0, 0, canvas.width, canvas.height
+        );
+
+        const blob = await new Promise(resolve =>
+            canvas.toBlob(resolve, "image/jpeg", 0.65)
+        );
+
+        if (!blob) throw new Error("Frame capture failed.");
+
+        const formData = new FormData();
+        formData.append("frame", blob, "iphone-frame.jpg");
+
+        const response = await fetch("/api/cameras/frame", {
+            method: "POST",
+            headers: {
+                "X-Camera-Token": cameraToken
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Frame sending failed.");
+        }
+
+        statusText.textContent =
+            "Connected | People: " + data.person_count +
+            " | Density: " + data.density;
+
+    } catch (error) {
+        statusText.textContent = "Camera error: " + error.message;
+        monitoring = false;
+    } finally {
+        sending = false;
+    }
+
+    if (monitoring) {
+        setTimeout(sendFrame, 2000);
+    }
+}
+
+startButton.addEventListener("click", async () => {
+    const locationId = locationSelect.value;
+
+    if (!locationId) {
+        statusText.textContent = "Please select a location.";
+        return;
+    }
+
+    try {
+        startButton.disabled = true;
+        statusText.textContent = "Connecting to iPhone camera...";
+
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            },
+            audio: false
+        });
+
+        video.srcObject = cameraStream;
+        await video.play();
+
+        // Register this iPhone as a mobile camera.
+        const registerResponse = await fetch("/api/cameras/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                camera_name: "iPhone Mobile Camera",
+                camera_type: "mobile",
+                location_id: locationId
+            })
+        });
+
+        const registerData = await registerResponse.json();
+
+        if (!registerResponse.ok || !registerData.success) {
+            throw new Error(registerData.message || "Registration failed.");
+        }
+
+        cameraId = registerData.camera_id;
+        cameraToken = registerData.camera_token;
+
+        monitoring = true;
+        stopButton.disabled = false;
+        statusText.textContent = "Camera connected. Starting AI...";
+        sendFrame();
+
+    } catch (error) {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+
+        video.srcObject = null;
+        monitoring = false;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        statusText.textContent = "Error: " + error.message;
+    }
+});
+
+stopButton.addEventListener("click", () => {
+    monitoring = false;
+
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+
+    video.srcObject = null;
+    cameraToken = null;
+    cameraId = null;
+
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    statusText.textContent = "Camera stopped.";
+});
+
+loadLocations();
+</script>
+</body>
+</html>

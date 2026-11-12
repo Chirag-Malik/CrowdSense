@@ -1,0 +1,160 @@
+
+{% extends "base.html" %}
+
+{% block title %}Locations | CrowdSense{% endblock %}
+{% block heading %}Locations{% endblock %}
+
+{% block content %}
+
+<section class="welcome-banner">
+    <p>LOCATION INTELLIGENCE</p>
+    <h1>Location Management</h1>
+    <p>Register and manage locations monitored by CrowdSense.</p>
+</section>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <p>Total Monitoring Zones</p>
+        <h2 id="location-total">0</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Connected Cameras</p>
+        <h2 id="location-cameras">0</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Current People Detected</p>
+        <h2 id="location-people">--</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Current Crowd Density</p>
+        <h2 id="location-density">Waiting</h2>
+    </div>
+
+</div>
+
+
+<!-- REGISTER LOCATION -->
+
+<div class="monitor-card">
+
+    <h2>Register New Location</h2>
+
+    <p>Add a public location to the CrowdSense network.</p>
+
+    <form id="add-location-form">
+
+        <div style="margin-top:20px;">
+
+            <label for="location_name">Location Name</label>
+
+            <input
+                type="text"
+                id="location_name"
+                name="location_name"
+                placeholder="Example: Main Railway Station"
+                required
+                style="width:100%; padding:12px; margin-top:8px;"
+            >
+
+        </div>
+
+        <div style="margin-top:15px;">
+
+            <label for="address">Full Address</label>
+
+            <textarea
+                id="address"
+                name="address"
+                placeholder="Enter complete location address"
+                required
+                rows="3"
+                style="width:100%; padding:12px; margin-top:8px;"
+            ></textarea>
+
+        </div>
+
+        <div style="margin-top:15px;">
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="is_public"
+                    checked
+                >
+                Make crowd information publicly visible
+            </label>
+
+        </div>
+
+        <button
+            type="submit"
+            class="primary-button"
+            style="margin-top:20px;"
+        >
+            Register Location
+        </button>
+
+        <p id="location-message" style="margin-top:12px;"></p>
+
+    </form>
+
+</div>
+
+
+<!-- REGISTERED LOCATIONS -->
+
+<div class="monitor-card" style="margin-top:25px;">
+
+    <h2>Registered Locations</h2>
+
+    <div id="registered-locations" style="margin-top:20px;">
+        Loading locations...
+    </div>
+
+</div>
+
+
+<!-- LIVE CAMERA STATUS -->
+
+<div class="monitor-card" style="margin-top:25px;">
+
+    <h2>Browser Camera Monitoring</h2>
+
+    <div class="stat-card">
+
+        <p><strong>Zone 01 — Browser Camera</strong></p>
+
+        <p>
+            Connection:
+            <span id="location-status">Offline</span>
+        </p>
+
+        <p>
+            Monitoring:
+            <span id="location-monitoring">Inactive</span>
+        </p>
+
+    </div>
+
+    <p style="margin-top:20px;">
+        Start live monitoring from the Live Monitoring page.
+    </p>
+
+    <a href="/monitoring"
+       class="primary-button"
+       style="display:inline-block; text-decoration:none; margin-top:10px;">
+        Open Live Monitoring
+    </a>
+
+</div>
+
+{% endblock %}
+
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/locations.js') }}"></script>
+{% endblock %}

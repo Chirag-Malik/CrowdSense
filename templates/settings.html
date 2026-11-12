@@ -1,0 +1,85 @@
+
+{% extends "base.html" %}
+
+{% block title %}Settings | CrowdSense{% endblock %}
+{% block heading %}Settings{% endblock %}
+
+{% block content %}
+
+<section class="welcome-banner">
+    <p>SYSTEM CONFIGURATION</p>
+    <h1>CrowdSense Settings</h1>
+    <p>Application information and AI detection configuration.</p>
+</section>
+
+<div class="monitor-grid">
+
+    <div class="monitor-card">
+        <h3>AI Model Configuration</h3>
+        <p>Model: <strong>YOLOv8n</strong></p>
+        <p>Task: <strong>Person Detection</strong></p>
+        <p>Detection Class: <strong>Person (Class 0)</strong></p>
+        <p>Inference Device: <strong>CPU</strong></p>
+        <p>Image Size: <strong>640 × 640</strong></p>
+        <p>Confidence Threshold: <strong>0.20</strong></p>
+        <p>IoU Threshold: <strong>0.50</strong></p>
+        <p>Maximum Detections: <strong>500</strong></p>
+    </div>
+
+    <div class="monitor-card">
+        <h3>Crowd Density Configuration</h3>
+
+        <p>
+            <strong style="color:#22c55e;">LOW</strong>
+            <br>0–5 people
+        </p>
+
+        <p>
+            <strong style="color:#eab308;">MEDIUM</strong>
+            <br>6–15 people
+        </p>
+
+        <p>
+            <strong style="color:#ef4444;">HIGH</strong>
+            <br>More than 15 people
+        </p>
+
+        <p>High-density events are stored in the alerts database.</p>
+    </div>
+
+    <div class="monitor-card">
+        <h3>Database Information</h3>
+        <p>Database: <strong>SQLite</strong></p>
+        <p>File: <strong>crowdsense.db</strong></p>
+        <p>Detection Records: <strong>Enabled</strong></p>
+        <p>Live Alerts: <strong>Enabled</strong></p>
+    </div>
+
+    <div class="monitor-card">
+        <h3>Application Information</h3>
+        <p>Application: <strong>CrowdSense</strong></p>
+        <p>Version: <strong>1.0.0</strong></p>
+        <p>Backend: <strong>Python Flask</strong></p>
+        <p>Frontend: <strong>HTML, CSS, JavaScript</strong></p>
+        <p>Computer Vision: <strong>OpenCV</strong></p>
+        <p>Status: <strong style="color:#22c55e;">Operational</strong></p>
+    </div>
+
+</div>
+
+<div class="monitor-card" style="margin-top:20px;">
+    <h3>About CrowdSense</h3>
+    <p>
+        CrowdSense is an AI-powered crowd monitoring prototype
+        designed to detect people, classify crowd density,
+        and generate high-density alerts using computer vision.
+    </p>
+
+    <p style="margin-top:15px;">
+        Developed by: <strong>Chirag Malik</strong>
+    </p>
+
+    <p>BSc Computer Science Project</p>
+</div>
+
+{% endblock %}

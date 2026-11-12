@@ -1,0 +1,90 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="analytics-page">
+
+    <div class="page-heading">
+        <h1>Live Crowd Monitoring</h1>
+        <p>AI-powered real-time people detection and crowd analysis.</p>
+    </div>
+
+    <div class="analytics-section">
+        <h2>Webcam Monitoring</h2>
+
+        <label for="monitored-location">Select Location</label>
+        <select id="monitored-location" style="width:100%;padding:12px;margin-top:8px;">
+            <option value="">Loading locations...</option>
+        </select>
+
+        <p id="camera-status">Camera is currently offline</p>
+
+        <video id="live-camera" autoplay playsinline muted
+            style="width:100%;max-height:450px;background:#000;border-radius:12px;"></video>
+        <canvas id="camera-canvas" hidden></canvas>
+
+        <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;">
+            <button id="start-camera" type="button">Start Webcam</button>
+            <button id="stop-camera" type="button" disabled>Stop Webcam</button>
+        </div>
+    </div>
+
+    <div class="analytics-cards">
+        <div class="analytics-card">
+            <h3>People Detected</h3>
+            <p id="live-person-count">0</p>
+        </div>
+        <div class="analytics-card">
+            <h3>Crowd Density</h3>
+            <p id="live-density">Waiting</p>
+        </div>
+        <div class="analytics-card">
+            <h3>Monitoring Status</h3>
+            <p id="monitoring-status">Offline</p>
+        </div>
+    </div>
+
+    <div id="live-alert"></div>
+
+    <div class="analytics-section" style="margin-top:30px;">
+        <h2>IP CCTV Camera Management</h2>
+        <p>Register and manage network CCTV cameras.</p>
+
+        <form id="ip-camera-form">
+            <label for="ip-camera-name">Camera Name</label>
+            <input id="ip-camera-name" type="text"
+                placeholder="e.g. Main Gate Camera" required
+                style="width:100%;padding:12px;margin:8px 0 15px;">
+
+            <label for="ip-camera-rtsp">RTSP Stream Address</label>
+            <input id="ip-camera-rtsp" type="password"
+                placeholder="rtsp://username:password@camera-ip:554/stream"
+                required autocomplete="off"
+                style="width:100%;padding:12px;margin:8px 0 15px;">
+
+            <button id="register-ip-camera" type="submit">
+                Register IP Camera
+            </button>
+        </form>
+
+        <p id="ip-camera-message" role="status" style="margin-top:15px;"></p>
+
+        <div id="new-camera-token" hidden
+            style="margin-top:12px;padding:12px;border:1px solid #888;border-radius:8px;">
+            <strong>One-time camera token</strong>
+            <p>Copy this token and keep it private. It will not be shown again.</p>
+            <code id="camera-token-value" style="overflow-wrap:anywhere;"></code>
+            <button id="copy-camera-token" type="button">Copy Token</button>
+        </div>
+
+        <h3 style="margin-top:25px;">Registered IP Cameras</h3>
+        <div id="ip-camera-list">
+            Loading cameras...
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/monitoring.js') }}"></script>
+{% endblock %}

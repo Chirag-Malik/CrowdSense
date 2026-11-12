@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}CrowdSense{% endblock %}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .cs-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .cs-sidebar {
+            width: 245px;
+            min-width: 245px;
+            background: #10131c;
+            padding: 25px 18px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .cs-brand {
+            color: white;
+            font-size: 23px;
+            font-weight: bold;
+            margin-bottom: 35px;
+        }
+
+        .cs-brand span {
+            color: #ef4444;
+        }
+
+        .cs-sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cs-nav-link {
+            display: block;
+            padding: 13px;
+            color: #a5adbd;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .cs-nav-link:hover,
+        .cs-nav-link.active {
+            background: #242a38;
+            color: white;
+        }
+
+        /* MAIN CONTENT */
+
+        .cs-main {
+            flex: 1;
+            min-width: 0;
+            padding: 30px;
+        }
+
+        .cs-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .cs-topbar h2 {
+            margin-top: 0;
+        }
+
+        .cs-online {
+            color: #22c55e;
+            white-space: nowrap;
+        }
+
+        .cs-content {
+            width: 100%;
+            max-width: 1400px;
+            margin: auto;
+            min-width: 0;
+        }
+
+        /* MOBILE MENU BUTTON */
+
+        .cs-mobile-menu {
+            display: none;
+            background: #242a38;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* TABLET AND MOBILE */
+
+        @media (max-width: 750px) {
+
+            .cs-layout {
+                flex-direction: column;
+            }
+
+            .cs-sidebar {
+                width: 100%;
+                min-width: 0;
+                min-height: auto;
+                padding: 15px;
+            }
+
+            .cs-sidebar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .cs-brand {
+                margin: 0;
+                font-size: 21px;
+            }
+
+            .cs-mobile-menu {
+                display: block;
+            }
+
+            .cs-sidebar nav {
+                display: none;
+                flex-direction: column;
+                gap: 5px;
+                margin-top: 15px;
+            }
+
+            .cs-sidebar nav.is-open {
+                display: flex;
+            }
+
+            .cs-nav-link {
+                padding: 12px;
+            }
+
+            .cs-sidebar-footer {
+                display: none;
+            }
+
+            .cs-main {
+                width: 100%;
+                padding: 18px 14px;
+            }
+
+            .cs-topbar {
+                align-items: flex-start;
+                margin-bottom: 22px;
+            }
+
+            .cs-topbar h2 {
+                font-size: 21px;
+                margin-bottom: 5px;
+            }
+
+            .cs-topbar p {
+                font-size: 13px;
+            }
+
+            .cs-online {
+                font-size: 12px;
+                padding-top: 5px;
+            }
+
+            .cs-content {
+                width: 100%;
+            }
+        }
+
+        /* SMALL PHONES */
+
+        @media (max-width: 400px) {
+            .cs-main {
+                padding: 14px 10px;
+            }
+
+            .cs-topbar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="cs-layout">
+
+    <aside class="cs-sidebar">
+
+        <div class="cs-sidebar-header">
+
+            <div class="cs-brand">
+                <span>●</span> CrowdSense
+            </div>
+
+            <button
+                class="cs-mobile-menu"
+                id="cs-menu-button"
+                type="button"
+                aria-label="Toggle navigation menu"
+                aria-expanded="false"
+                aria-controls="cs-navigation">
+                ☰
+            </button>
+
+        </div>
+
+        <nav id="cs-navigation">
+
+            <a class="cs-nav-link {% if active_page == 'public' %}active{% endif %}"
+               href="/">Homepage</a>
+
+            <a class="cs-nav-link {% if active_page == 'dashboard' %}active{% endif %}"
+               href="{{ url_for('home') }}">Dashboard</a>
+
+            <a class="cs-nav-link {% if active_page == 'monitoring' %}active{% endif %}"
+               href="{{ url_for('monitoring') }}">Live Monitoring</a>
+
+            <a class="cs-nav-link {% if active_page == 'detection' %}active{% endif %}"
+               href="{{ url_for('detection') }}">AI Detection</a>
+
+            <a class="cs-nav-link {% if active_page == 'analytics' %}active{% endif %}"
+               href="{{ url_for('analytics') }}">Analytics</a>
+
+            <a class="cs-nav-link {% if active_page == 'alerts' %}active{% endif %}"
+               href="{{ url_for('alerts') }}">Alerts</a>
+
+            <a class="cs-nav-link {% if active_page == 'locations' %}active{% endif %}"
+               href="{{ url_for('locations') }}">Locations</a>
+
+            <a class="cs-nav-link {% if active_page == 'settings' %}active{% endif %}"
+               href="{{ url_for('settings') }}">Settings</a>
+
+        </nav>
+
+        <div class="cs-sidebar-footer"
+             style="margin-top:auto; color:#22c55e; padding:15px 5px;">
+
+            ● System Online
+
+            <p style="color:#777; font-size:12px;">
+                CrowdSense v1.0
+            </p>
+
+        </div>
+
+    </aside>
+
+    <main class="cs-main">
+
+        <header class="cs-topbar">
+
+            <div>
+                <h2>{% block heading %}CrowdSense{% endblock %}</h2>
+                <p>AI-powered crowd intelligence platform</p>
+            </div>
+
+            <span class="cs-online">● Online</span>
+
+        </header>
+
+        <div class="cs-content">
+            {% block content %}{% endblock %}
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const menuButton = document.getElementById("cs-menu-button");
+    const navigation = document.getElementById("cs-navigation");
+
+    if (menuButton && navigation) {
+
+        menuButton.addEventListener("click", function () {
+
+            const isOpen = navigation.classList.toggle("is-open");
+
+            menuButton.setAttribute("aria-expanded", isOpen);
+            menuButton.textContent = isOpen ? "✕" : "☰";
+
+        });
+
+    }
+
+});
+</script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+{% block page_scripts %}{% endblock %}
+
+</body>
+</html>

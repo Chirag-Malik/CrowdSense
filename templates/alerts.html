@@ -1,0 +1,55 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="analytics-page">
+
+    <div class="page-heading">
+        <h1>Crowd Alerts</h1>
+        <p>Monitor high-density crowd situations detected by AI.</p>
+    </div>
+
+    <div class="analytics-cards">
+
+        <div class="analytics-card">
+            <h3>Total High-Density Alerts</h3>
+            <p id="total-alerts">--</p>
+        </div>
+
+    </div>
+
+    <div class="analytics-section">
+
+        <h2>Recent High-Density Events</h2>
+
+        <div class="table-container">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>People Detected</th>
+                        <th>Density</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+
+                <tbody id="alerts-history">
+                    <tr>
+                        <td colspan="4">Loading alerts...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+{% endblock %}

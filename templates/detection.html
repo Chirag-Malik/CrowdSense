@@ -1,0 +1,73 @@
+
+{% extends "base.html" %}
+
+{% block title %}AI Detection | CrowdSense{% endblock %}
+{% block heading %}AI Person Detection{% endblock %}
+
+{% block content %}
+
+<div class="monitor-card">
+
+    <h2>YOLOv8 Crowd Detection</h2>
+
+    <p>
+        Upload a photograph to detect and count people
+        using artificial intelligence.
+    </p>
+
+    <input
+        type="file"
+        id="detection-input"
+        accept=".jpg,.jpeg,.png,.webp"
+    >
+
+    <br><br>
+
+    <button
+        id="detect-button"
+        class="primary-button"
+        type="button">
+        Start AI Detection
+    </button>
+
+    <p id="detection-message">
+        Select an image to begin.
+    </p>
+
+</div>
+
+
+<div id="detection-result"
+     class="monitor-card"
+     style="display:none; margin-top:25px;">
+
+    <h2>Detection Results</h2>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <p>People Detected</p>
+            <h2 id="person-count">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Crowd Level</p>
+            <h2 id="density-level">--</h2>
+        </div>
+
+    </div>
+
+    <h3>Processed Image</h3>
+
+    <img
+        id="detected-image"
+        alt="YOLO person detection result"
+        style="width:100%; max-width:800px; border-radius:12px;"
+    >
+
+</div>
+
+{% endblock %}
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/detection.js') }}"></script>
+{% endblock %}

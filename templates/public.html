@@ -1,0 +1,694 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrowdSense | Public Crowd Monitor</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: #0b1120;
+    color: #f8fafc;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 7%;
+    background: #111a2b;
+    border-bottom: 1px solid #263449;
+}
+
+header h2 {
+    margin: 0;
+    color: #ff5964;
+    font-size: 25px;
+}
+
+a { text-decoration: none; color: white; }
+
+.login {
+    background: #e63946;
+    padding: 11px 17px;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.hero {
+    text-align: center;
+    padding: 65px 20px 45px;
+    background: linear-gradient(135deg,#111a2b,#18243a);
+}
+
+.hero h1 {
+    font-size: clamp(30px,5vw,48px);
+    margin: 0 0 15px;
+}
+
+.hero p {
+    color: #aebbd0;
+    font-size: 16px;
+}
+
+.status {
+    color: #36d399;
+    font-size: 13px;
+    margin-top: 22px;
+}
+
+.container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 35px 5%;
+}
+
+.heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.heading h2 { font-size: 23px; }
+
+#refreshTime {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+input {
+    width: 100%;
+    padding: 15px;
+    margin: 15px 0;
+    background: #172338;
+    border: 1px solid #33445e;
+    color: white;
+    border-radius: 9px;
+    outline: none;
+}
+
+input:focus { border-color: #ff5964; }
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.filters button {
+    background: #172338;
+    color: white;
+    border: 1px solid #33445e;
+    padding: 10px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.filters button.active {
+    background: #e63946;
+    border-color: #e63946;
+}
+
+.locations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 18px;
+}
+
+.card {
+    background: #172338;
+    border: 1px solid #2d3d55;
+    border-radius: 13px;
+    padding: 22px;
+    transition: transform .2s,border-color .2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: #64748b;
+}
+
+.card h3 { margin-top: 0; }
+
+.muted {
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.count {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 18px 0 5px;
+}
+
+.density {
+    display: inline-block;
+    padding: 7px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.Low {
+    color: #36d399;
+    background: #123c32;
+}
+
+.Moderate {
+    color: #fbbf24;
+    background: #453817;
+}
+
+.High {
+    color: #ff5964;
+    background: #481e29;
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #94a3b8;
+    border-top: 1px solid #263449;
+    font-size: 13px;
+}
+
+.empty {
+    color: #94a3b8;
+    padding: 30px 0;
+}
+
+@media(max-width:600px) {
+    header { padding: 17px 5%; }
+    header h2 { font-size: 21px; }
+    .login { padding: 9px 11px; font-size: 12px; }
+    .hero { padding: 50px 18px; }
+    .container { padding: 25px 5%; }
+}
+
+
+.camera-status {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 12px;
+}
+
+.camera-online {
+    color: #36d399;
+    background: #123c32;
+}
+
+.camera-offline {
+    color: #ff5964;
+    background: #481e29;
+}
+.search-suggestions {
+    background: #1c2230;
+    border-radius: 8px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.search-suggestion {
+    padding: 12px;
+    cursor: pointer;
+    color: white;
+    border-bottom: 1px solid #394355;
+}
+
+.search-suggestion:hover {
+    background: #30394a;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>CrowdSense</h2>
+    <a class="login" href="/login">Owner Login</a>
+</header>
+
+<section class="hero">
+    <h1>Know the crowd before you go.</h1>
+    <p>Explore crowd conditions at participating public locations.</p>
+    <div class="status">● Public Crowd Information</div>
+</section>
+
+<main class="container">
+
+    <div class="heading">
+        <h2>Explore Locations</h2>
+        <span id="refreshTime">Loading...</span>
+    </div>
+
+    <input
+        type="search"
+        id="search"
+        placeholder="Search location or address..."
+    >
+    <div id="searchSuggestions" class="search-suggestions"></div>
+
+    <div class="filters">
+        <button class="active" data-filter="All">All</button>
+        <button data-filter="Low">Low</button>
+        <button data-filter="Moderate">Moderate</button>
+        <button data-filter="High">High</button>
+    </div>
+    
+<section class="card" style="margin-bottom:25px;">
+    <h2>Crowd Analytics</h2>
+    <p class="muted">Last 1 hour crowd activity</p>
+    <select id="analyticsLocation">
+    <option value="">Select Location</option>
+    </select>
+
+    <div style="display:flex;gap:30px;flex-wrap:wrap;margin:20px 0;">
+        <div>
+            <p class="muted">Peak Crowd</p>
+            <h2 id="peakCount">--</h2>
+        </div>
+
+        <div>
+            <p class="muted">Average Crowd</p>
+            <h2 id="averageCount">--</h2>
+        </div>
+
+        <div>
+            <p class="muted">Total Readings</p>
+            <h2 id="totalReadings">--</h2>
+        </div>
+    </div>
+
+    <canvas id="crowdChart" height="100"></canvas>
+    <p id="chartMessage" class="muted"></p>
+</section>
+
+    <div class="locations" id="locations">
+        <p class="empty">Loading locations...</p>
+    </div>
+
+</main>
+
+<footer>
+    <strong>CrowdSense</strong>
+    <p>AI-powered public crowd information.</p>
+    <p>Crowd counts are estimates from participating camera systems.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const container = document.getElementById("locations");
+const search = document.getElementById("search");
+const refreshTime = document.getElementById("refreshTime");
+
+let allLocations = [];
+let activeFilter = "All";
+function renderLocations
+() {
+
+    const term = search.value.toLowerCase();
+
+    const filtered = allLocations.filter(location => {
+
+        const matchesSearch =
+            (location.location_name || "").toLowerCase().includes(term) ||
+            (location.address || "").toLowerCase().includes(term);
+
+        const matchesFilter =
+            activeFilter === "All" ||
+            location.density === activeFilter;
+
+        return matchesSearch && matchesFilter;
+    });
+
+    container.replaceChildren();
+
+    if (!filtered.length) {
+        container.innerHTML =
+            '<p class="empty">No matching locations found.</p>';
+        return;
+    }
+
+    filtered.forEach(location => {
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const title = document.createElement("h3");
+        title.textContent = location.location_name;
+
+        const address = document.createElement("p");
+        address.className = "muted";
+        address.textContent = location.address || "Address unavailable";
+
+        const count = document.createElement("div");
+        count.className = "count";
+        count.textContent =
+            location.people === null || location.people === undefined
+                ? "--"
+                : location.people;
+
+        const countLabel = document.createElement("p");
+        countLabel.className = "muted";
+        countLabel.textContent = "People detected";
+
+        const density = document.createElement("span");
+        density.className = "density " +
+            (["Low","Moderate","High"].includes(location.density)
+                ? location.density : "");
+        density.textContent = location.density || "No data";
+
+const trend = document.createElement("p");
+trend.className = "muted";
+trend.textContent = "Crowd trend: Loading...";
+        
+const updated = document.createElement("p");
+updated.className = "muted";
+
+const cameraStatus = document.createElement("span");
+cameraStatus.className = "camera-status";
+
+if (location.updated_at) {
+
+    updated.textContent = "Last updated: " + location.updated_at;
+
+    const lastUpdate = new Date(
+        location.updated_at.replace(" ", "T")
+    ).getTime();
+
+    const age = Date.now() - lastUpdate;
+
+    if (age >= -5000 && age <= 30000) {
+        cameraStatus.classList.add("camera-online");
+        cameraStatus.textContent = "● Camera Online";
+    } else {
+        cameraStatus.classList.add("camera-offline");
+        cameraStatus.textContent = "● Camera Offline";
+    }
+
+} else {
+    updated.textContent = "No detection data available";
+    cameraStatus.classList.add("camera-offline");
+    cameraStatus.textContent = "● Camera Offline";
+}
+
+card.append(
+    title,
+    address,
+    count,
+    countLabel,
+    density,
+    trend,
+    cameraStatus,
+    updated
+);
+
+updateCrowdTrend(location.id, trend);
+
+        container.appendChild(card);
+    });
+}
+
+
+async function updateCrowdTrend(locationId, trendElement) {
+
+    try {
+        const response = await fetch(
+            `/api/crowd-trend/${locationId}`
+        );
+
+        if (!response.ok) {
+            throw new Error("Trend unavailable");
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error("Unable to calculate trend");
+        }
+
+        if (data.trend === "Increasing") {
+            trendElement.textContent =
+                `↑ Crowd Increasing (+${data.change})`;
+            trendElement.style.color = "#ff5964";
+
+        } else if (data.trend === "Decreasing") {
+            trendElement.textContent =
+                `↓ Crowd Decreasing (${data.change})`;
+            trendElement.style.color = "#36d399";
+
+        } else if (data.trend === "Stable") {
+            trendElement.textContent =
+                "→ Crowd Stable";
+            trendElement.style.color = "#94a3b8";
+
+        } else {
+            trendElement.textContent =
+                "Crowd trend: Insufficient data";
+            trendElement.style.color = "#94a3b8";
+        }
+
+    } catch (error) {
+        console.error("Crowd trend error:", error);
+        trendElement.textContent = "Crowd trend unavailable";
+    }
+}
+
+
+async function loadLocations() {
+
+    try {
+
+        const response = await fetch("/api/public-locations");
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error("Unable to retrieve locations");
+        }
+
+        allLocations = data.locations || [];
+
+        const selector = document.getElementById("analyticsLocation");
+
+selector.innerHTML = "";
+
+allLocations.forEach(location => {
+    const option = document.createElement("option");
+    option.value = location.id;
+    option.textContent = location.location_name;
+    selector.appendChild(option);
+});
+
+if (allLocations.length > 0) {
+    selector.value = allLocations[0].id;
+    loadCrowdAnalytics(selector.value);
+}
+
+        renderLocations();
+
+        if (allLocations.length > 0) {
+    loadCrowdAnalytics(allLocations[0].id);
+}
+
+        refreshTime.textContent =
+            "Refreshed: " + new Date().toLocaleTimeString();
+
+    } catch(error) {
+
+        console.error(error);
+        refreshTime.textContent = "Connection unavailable";
+
+        if (!allLocations.length) {
+            container.textContent =
+                "Unable to load locations. Please try again.";
+        }
+    }
+}
+
+search.addEventListener("input",renderLocations);
+
+document.querySelectorAll(".filters button").forEach(button => {
+
+    button.addEventListener("click",() => {
+
+        document.querySelector(".filters button.active")
+            ?.classList.remove("active");
+
+        button.classList.add("active");
+
+        activeFilter = button.dataset.filter;
+
+        renderLocations();
+    });
+});
+
+document.getElementById("search").addEventListener("input", renderLocations);
+
+loadLocations();
+
+setInterval(() => {
+    const selector = document.getElementById("analyticsLocation");
+
+    if (selector.value) {
+        loadCrowdAnalytics(selector.value);
+    }
+}, 15000);
+
+setInterval(loadLocations,15000);
+
+let crowdChart = null;
+
+async function loadCrowdAnalytics(locationId) {
+    try {
+        const response = await fetch(`/api/crowd-history/${locationId}`);
+        const data = await response.json();
+
+        if (!data.success) return;
+
+        document.getElementById("peakCount").textContent = data.peak;
+        document.getElementById("averageCount").textContent = data.average;
+        document.getElementById("totalReadings").textContent = data.total_readings;
+
+        const labels = data.history.map(item => item.time.split(" ")[1]);
+        const counts = data.history.map(item => item.people);
+
+        const ctx = document.getElementById("crowdChart").getContext("2d");
+
+        if (crowdChart) {
+            crowdChart.destroy();
+        }
+
+        crowdChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "People Count",
+                    data: counts,
+                    borderColor: "#e63946",
+                    backgroundColor: "rgba(230, 57, 70, 0.15)",
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Analytics error:", error);
+    }
+}
+
+document.getElementById("analyticsLocation").addEventListener("change", function () {
+    if (this.value) {
+        loadCrowdAnalytics(this.value);
+    }
+});
+search.addEventListener("input", function () {
+    renderLocations();
+});
+const suggestionsBox = document.getElementById("searchSuggestions");
+
+let suggestions = [];
+let selectedIndex = -1;
+
+function selectSuggestion(location) {
+    search.value = location.location_name;
+
+    suggestionsBox.replaceChildren();
+    selectedIndex = -1;
+
+    const selector = document.getElementById("analyticsLocation");
+    selector.value = location.id;
+
+    loadCrowdAnalytics(location.id);
+    renderLocations();
+}
+
+search.addEventListener("input", function () {
+
+    const term = this.value.toLowerCase().trim();
+
+    renderLocations();
+    suggestionsBox.replaceChildren();
+
+    suggestions = [];
+    selectedIndex = -1;
+
+    if (!term) return;
+
+    suggestions = allLocations.filter(location =>
+        (location.location_name || "").toLowerCase().includes(term) ||
+        (location.address || "").toLowerCase().includes(term)
+    ).slice(0, 5);
+
+    suggestions.forEach((location, index) => {
+
+        const item = document.createElement("div");
+        item.className = "search-suggestion";
+        item.textContent = location.location_name;
+
+        item.addEventListener("click", () => {
+            selectSuggestion(location);
+        });
+
+        suggestionsBox.appendChild(item);
+    });
+});
+
+search.addEventListener("keydown", function(event) {
+
+    if (event.key === "ArrowDown" && suggestions.length) {
+        event.preventDefault();
+        selectedIndex = (selectedIndex + 1) % suggestions.length;
+    }
+
+    else if (event.key === "ArrowUp" && suggestions.length) {
+        event.preventDefault();
+        selectedIndex =
+            (selectedIndex - 1 + suggestions.length) % suggestions.length;
+    }
+
+    else if (event.key === "Enter" && selectedIndex >= 0) {
+        event.preventDefault();
+        selectSuggestion(suggestions[selectedIndex]);
+    }
+
+    else if (event.key === "Escape") {
+        suggestionsBox.replaceChildren();
+        selectedIndex = -1;
+    }
+
+    Array.from(suggestionsBox.children).forEach((item, index) => {
+        item.style.background =
+            index === selectedIndex ? "#394355" : "";
+    });
+});
+</script>
+</body>
+</html>

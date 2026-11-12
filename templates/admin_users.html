@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CrowdSense Admin</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 30px;
+            background: #10131b;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        .card {
+            background: #1c2230;
+            padding: 25px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 13px;
+            margin-top: 12px;
+            border: 1px solid #394355;
+            border-radius: 7px;
+            background: #101722;
+            color: white;
+        }
+
+        button {
+            padding: 12px 18px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 7px;
+            background: #e63946;
+            color: white;
+            cursor: pointer;
+        }
+
+        .owner {
+            background: #252d3d;
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .message {
+            color: #55dd88;
+            margin-bottom: 20px;
+        }
+
+        .password-wrapper {
+            position: relative;
+            margin-top: 12px;
+        }
+
+        .password-wrapper input {
+            margin-top: 0;
+            padding-right: 55px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 8px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        a {
+            color: #e63946;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>CrowdSense Admin Panel</h1>
+    <p>Welcome, {{ session.username }}</p>
+
+    {% if request.args.get('message') %}
+        <p class="message">{{ request.args.get('message') }}</p>
+    {% endif %}
+
+    <div class="card">
+
+        <h2>Create Location Owner</h2>
+
+        <form method="POST">
+
+            <input
+                name="username"
+                placeholder="Owner username"
+                required
+            >
+
+            <div class="password-wrapper">
+                <input
+                    name="password"
+                    type="password"
+                    class="password-input"
+                    placeholder="Password (minimum 10 characters)"
+                    minlength="10"
+                    required
+                >
+                <button type="button" class="toggle-password"
+                        aria-label="Show password">👁</button>
+            </div>
+
+            <input
+                name="location_name"
+                placeholder="Location name"
+                required
+            >
+
+            <button type="submit">
+                Create Owner Account
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Registered Location Owners</h2>
+
+        {% for user in users %}
+
+            <div class="owner">
+
+                <h3>{{ user.username }}</h3>
+
+                <p>Location: {{ user.location_name }}</p>
+
+                <details>
+
+                    <summary style="cursor:pointer; color:#e63946;">
+                        Reset Owner Password
+                    </summary>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('reset_owner_password', user_id=user.id) }}"
+                    >
+
+                        <div class="password-wrapper">
+                            <input
+                                name="password"
+                                type="password"
+                                class="password-input"
+                                placeholder="New password"
+                                minlength="10"
+                                required
+                            >
+                            <button type="button"
+                                    class="toggle-password"
+                                    aria-label="Show password">👁</button>
+                        </div>
+
+                        <div class="password-wrapper">
+                            <input
+                                name="confirm_password"
+                                type="password"
+                                class="password-input"
+                                placeholder="Confirm new password"
+                                minlength="10"
+                                required
+                            >
+                            <button type="button"
+                                    class="toggle-password"
+                                    aria-label="Show password">👁</button>
+                        </div>
+
+                        <button type="submit">
+                            Update Password
+                        </button>
+
+                    </form>
+
+                </details>
+
+            </div>
+
+        {% else %}
+
+            <p>No location owners created yet.</p>
+
+        {% endfor %}
+
+    </div>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+</div>
+
+
+<script>
+document.querySelectorAll(".toggle-password").forEach(function(button) {
+
+    button.addEventListener("click", function() {
+
+        const input = this.parentElement.querySelector(".password-input");
+
+        if (input.type === "password") {
+            input.type = "text";
+            this.textContent = "🙈";
+            this.setAttribute("aria-label", "Hide password");
+        } else {
+            input.type = "password";
+            this.textContent = "👁";
+            this.setAttribute("aria-label", "Show password");
+        }
+
+    });
+
+});
+</script>
+
+</body>
+</html>
